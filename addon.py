@@ -1,5 +1,5 @@
 #
-#      Copyright (C) 2014 Tommy Winther
+#      Copyright (C) 2015 Tommy Winther
 #      http://tommy.winther.nu
 #
 #  This Program is free software; you can redistribute it and/or modify
@@ -37,7 +37,6 @@ FILM_URL = BASE_URL + '/shortlist/film/%s/'
 
 
 def showOverview(page=1):
-    print page
     u = urllib2.urlopen(VIDEO_URL % page)
     html = u.read()
     u.close()
@@ -77,18 +76,18 @@ def playFilm(slug):
     html = u.read()
     u.close()
 
-    m = re.search('class="title">.*?<h2>([^<]+)</h2>.*?class="poster" href="([^"]+)".*?class="mp4" href="([^"]+)".*?class="vignetteMp4" href="([^"]+)"', html, re.DOTALL)
+    m = re.search('<div class="title">.*?<h2>(.*?)</h2>.*?<a class="vignette" href="([^"]+)" data-type="video/mp4">.*?<video.*?poster="([^"]+)".*?<source src="([^"]+)" type=\'video/mp4\' data-res="HD" />', html, re.DOTALL)
     if m is not None:
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         playlist.clear()
 
-        image = BASE_URL + m.group(2)
+        image = BASE_URL + m.group(3)
         # vignette
-        url = BASE_URL + m.group(4)
+        url = BASE_URL + m.group(2)
         item = xbmcgui.ListItem(label=m.group(1), path=url, thumbnailImage=image)
         playlist.add(url, item)
         # film
-        url = BASE_URL + m.group(3)
+        url = BASE_URL + m.group(4)
         playlist.add(url, xbmcgui.ListItem(label=m.group(1), path=url, thumbnailImage=image))
 
     else:
